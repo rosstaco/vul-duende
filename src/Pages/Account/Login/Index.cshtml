@@ -1,0 +1,175 @@
+@page
+@model VulDuende.Pages.Login.Index
+
+<link rel="stylesheet" href="~/css/modern-login.css" />
+
+<div class="modern-login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1 class="login-title">Welcome</h1>
+            <p class="login-subtitle">Choose how to sign in</p>
+        </div>
+
+        <partial name="_ValidationSummary" />
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Main Sign-in Options (Always Visible) -->
+        <div class="auth-options">
+
+            <!-- Passkey Sign-in Button -->
+            <button id="signInWithPasskey" class="btn btn-primary btn-sign-in">
+                <i class="fas fa-fingerprint"></i>
+                <span>Sign in with Passkey</span>
+            </button>
+
+            @if (Model.View.VisibleExternalProviders.Any())
+            {
+                @foreach (var provider in Model.View.VisibleExternalProviders)
+                {
+                    var providerClass = provider.DisplayName.ToLower().Contains("microsoft") ? "microsoft" :
+                                      provider.DisplayName.ToLower().Contains("google") ? "google" :
+                                      provider.DisplayName.ToLower().Contains("apple") ? "apple" : "";
+
+                    <a class="btn btn-primary btn-sign-in @providerClass"
+                       asp-page="/ExternalLogin/Challenge"
+                       asp-route-scheme="@provider.AuthenticationScheme"
+                       asp-route-returnUrl="@Model.Input.ReturnUrl">
+                        @if (provider.DisplayName.ToLower().Contains("microsoft"))
+                        {
+                            <i class="fab fa-microsoft"></i>
+                        }
+                        else if (provider.DisplayName.ToLower().Contains("google"))
+                        {
+                            <i class="fab fa-google"></i>
+                        }
+                        else if (provider.DisplayName.ToLower().Contains("apple"))
+                        {
+                            <i class="fab fa-apple"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-sign-in-alt"></i>
+                        }
+                        <span>Continue with @provider.DisplayName</span>
+                    </a>
+                }
+            }
+
+            @if (Model.View.EnableLocalLogin)
+            {
+                <!-- Local Account Sign-in Button -->
+                <button id="showLocalLogin" class="btn btn-secondary btn-sign-in" type="button">
+                    <i class="fas fa-user"></i>
+                    <span>Sign in with username</span>
+                </button>
+            }
+        </div>
+
+        <!-- Local Login Form (Hidden by Default) -->
+        @if (Model.View.EnableLocalLogin)
+        {
+            <div id="localLoginForm" class="local-login-form hidden">
+                <form asp-page="/Account/Login/Index">
+                    <input type="hidden" asp-for="Input.ReturnUrl" />
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <input class="form-control"
+                               placeholder="Username"
+                               asp-for="Input.Username"
+                               autocomplete="username"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password"
+                               class="form-control"
+                               placeholder="Password"
+                               asp-for="Input.Password"
+                               autocomplete="current-password"
+                               required>
+                    </div>
+
+                    @if (Model.View.AllowRememberLogin)
+                    {
+                        <div class="form-group-checkbox">
+                            <label class="checkbox-label">
+                                <input type="checkbox" asp-for="Input.RememberLogin">
+                                <span class="checkmark"></span>
+                                Remember me
+                            </label>
+                        </div>
+                    }
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary btn-full" name="Input.Button" value="login" type="submit">
+                            Sign In
+                        </button>
+                        <button class="btn btn-link" id="cancelLocalLogin" type="button">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        }
+
+        <!-- Passkey Registration Form (Hidden by Default) -->
+        <div id="passkeyRegistration" class="passkey-registration hidden">
+            <div class="section-header">
+                <h3>Register a Passkey</h3>
+                <p>Create a passkey for secure, password-free sign-in</p>
+            </div>
+
+            <div class="form-group">
+                <input type="text"
+                       id="registerUsername"
+                       class="form-control"
+                       placeholder="Username"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <input type="email"
+                       id="registerEmail"
+                       class="form-control"
+                       placeholder="Email address"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <input type="text"
+                       id="registerDisplayName"
+                       class="form-control"
+                       placeholder="Display name (optional)">
+            </div>
+
+            <div class="form-actions">
+                <button id="registerPasskey" class="btn btn-primary btn-full">
+                    <i class="fas fa-plus"></i> Create Passkey
+                </button>
+                <button class="btn btn-link" id="cancelPasskeyRegistration" type="button">
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- Additional Options (Hidden by Default) -->
+        <div class="additional-options hidden">
+            <button type="button" id="showPasskeyRegistration" class="btn btn-link">
+                <i class="fas fa-plus"></i> Create a new passkey
+            </button>
+        </div>
+
+        @if (!Model.View.EnableLocalLogin && !Model.View.VisibleExternalProviders.Any())
+        {
+            <div class="status-message error visible">
+                <strong>Invalid login request</strong><br>
+                There are no login schemes configured for this request.
+            </div>
+        }
+    </div>
+</div>
+
+<script src="~/js/passkey-login-enhanced.js"></script>

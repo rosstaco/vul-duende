@@ -1,0 +1,41 @@
+# Use this docker-compose.yml if you need additional services
+# like databases, Redis, etc. alongside your .NET application
+# To use this, update devcontainer.json to reference this compose file
+
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    networks:
+      - dev-network
+
+  # Uncomment and configure additional services as needed
+  # db:
+  #   image: postgres:15
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_DB: myapp
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - dev-network
+
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: unless-stopped
+  #   networks:
+  #     - dev-network
+
+networks:
+  dev-network:
+
+# volumes:
+#   postgres-data:

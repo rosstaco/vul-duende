@@ -1,0 +1,58 @@
+{
+  "name": ".NET 8 Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-8.0-jammy",
+  
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "ms-vscode.vscode-json",
+        "ms-vscode.hexeditor",
+        "bradlc.vscode-tailwindcss",
+        "formulahendry.auto-rename-tag",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next"
+      ],
+      // Set *default* container specific settings.json values on container create.
+      "settings": {
+        "dotnet.defaultSolution": "disable",
+        "omnisharp.enableEditorConfigSupport": true,
+        "omnisharp.enableRoslynAnalyzers": true,
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "explicit",
+          "source.organizeImports": "explicit"
+        }
+      }
+    }
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [5000, 5001, 7000, 7001],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "dotnet --version && echo 'Welcome to your .NET 8 development environment!'",
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+
+  // Set the default user to vscode
+  "remoteUser": "vscode",
+
+  // Add lifecycle scripts
+  "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}"
+}

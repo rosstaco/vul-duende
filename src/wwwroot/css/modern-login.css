@@ -1,0 +1,621 @@
+/* Import FontAwesome for icons */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* Modern Login Page Styles */
+.modern-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.login-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.login-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+}
+
+.login-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+.auth-section {
+    margin-bottom: 24px;
+}
+
+.auth-divider {
+    text-align: center;
+    margin: 24px 0;
+    position: relative;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e5e5e5;
+}
+
+.auth-divider span {
+    background: #ffffff;
+    color: #999;
+    padding: 0 16px;
+    font-size: 14px;
+    position: relative;
+}
+
+/* Passkey Styles */
+.passkey-section {
+    margin-bottom: 16px;
+}
+
+.passkey-auto-detect {
+    text-align: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 16px;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.passkey-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.9;
+}
+
+.passkey-auto-detect h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.passkey-auto-detect p {
+    font-size: 14px;
+    margin: 0 0 16px 0;
+    opacity: 0.9;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Button Styles */
+.btn {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-passkey {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-passkey:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    color: white;
+}
+
+.btn-passkey-alt {
+    background: #f8f9fa;
+    color: #495057;
+    border: 2px solid #e9ecef;
+}
+
+.btn-passkey-alt:hover {
+    background: #e9ecef;
+    color: #495057;
+    border-color: #dee2e6;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+    color: white;
+}
+
+.btn-external {
+    background: #ffffff;
+    color: #333;
+    border: 2px solid #e5e5e5;
+    font-weight: 500;
+}
+
+.btn-external:hover {
+    background: #f8f9fa;
+    color: #333;
+    border-color: #ccc;
+}
+
+.btn-external.microsoft {
+    border-color: #00a4ef;
+    color: #00a4ef;
+}
+
+.btn-external.microsoft:hover {
+    background: #00a4ef;
+    color: white;
+}
+
+.btn-external.google {
+    border-color: #db4437;
+    color: #db4437;
+}
+
+.btn-external.google:hover {
+    background: #db4437;
+    color: white;
+}
+
+.btn-external.apple {
+    border-color: #000;
+    color: #000;
+}
+
+.btn-external.apple:hover {
+    background: #000;
+    color: white;
+}
+
+.btn-link {
+    background: none;
+    color: #007bff;
+    border: none;
+    padding: 8px 0;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+    background: none;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+    background: #fff;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-control::placeholder {
+    color: #999;
+}
+
+/* Remember Me Checkbox */
+.remember-me {
+    margin: 20px 0;
+}
+
+.remember-label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    user-select: none;
+}
+
+.remember-label input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+}
+
+/* Register Section */
+.register-section {
+    border-top: 1px solid #e5e5e5;
+    padding-top: 24px;
+    margin-top: 24px;
+}
+
+.register-form {
+    margin-top: 16px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.register-form h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: #333;
+}
+
+/* Status Messages */
+.status-message {
+    display: none;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.status-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.status-message.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* Utility classes for progressive disclosure */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+.flex-visible {
+    display: flex !important;
+}
+
+/* Initial state for forms */
+.local-login-form,
+.passkey-registration {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    animation: slideDown 0.3s ease-out;
+}
+
+.local-login-form.visible,
+.passkey-registration.visible {
+    display: block;
+}
+
+.additional-options {
+    display: none;
+    text-align: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.additional-options.visible {
+    display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .modern-login-container {
+        padding: 16px;
+    }
+
+    .login-card {
+        padding: 24px;
+    }
+
+    .login-title {
+        font-size: 24px;
+    }
+}
+
+/* Loading Animation */
+.btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    color: white;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Passkey Options */
+.passkey-options {
+    margin-top: 12px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Validation Summary Styles */
+.validation-summary-errors {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+.validation-summary-errors ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.validation-summary-errors li {
+    margin: 4px 0;
+}
+
+/* Compact Login Layout Styles */
+.auth-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.btn-sign-in {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: none;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn-sign-in:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+}
+
+.btn-sign-in i {
+    font-size: 18px;
+}
+
+.btn-primary.btn-sign-in {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary.btn-sign-in:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    color: white;
+}
+
+.btn-secondary.btn-sign-in {
+    background: #f8f9fa;
+    color: #495057;
+    border: 2px solid #e9ecef;
+}
+
+.btn-secondary.btn-sign-in:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+/* External Provider Specific Styles */
+.btn-sign-in.microsoft {
+    background: #fff;
+    color: #00a4ef;
+    border: 2px solid #00a4ef;
+}
+
+.btn-sign-in.microsoft:hover {
+    background: #00a4ef;
+    color: white;
+}
+
+.btn-sign-in.google {
+    background: #fff;
+    color: #db4437;
+    border: 2px solid #db4437;
+}
+
+.btn-sign-in.google:hover {
+    background: #db4437;
+    color: white;
+}
+
+.btn-sign-in.apple {
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+}
+
+.btn-sign-in.apple:hover {
+    background: #000;
+    color: white;
+}
+
+/* Hidden Forms */
+.local-login-form,
+.passkey-registration {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.section-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 8px 0;
+}
+
+.section-header p {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.form-group-checkbox {
+    margin: 16px 0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+}
+
+.checkmark {
+    margin-left: 4px;
+}
+
+/* Additional Options */
+.additional-options {
+    display: none;
+    text-align: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.additional-options.visible {
+    display: block;
+}

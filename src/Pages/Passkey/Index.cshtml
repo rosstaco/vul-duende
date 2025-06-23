@@ -1,0 +1,365 @@
+@page
+@model VulDuende.Pages.Passkey.IndexModel
+@{
+    ViewData["Title"] = "Passkey Management";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-key"></i> Passkey Management</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">@Model.Message</p>
+
+                    <!-- Registration Section -->
+                    <div class="mb-4">
+                        <h4>Register a New Passkey</h4>
+                        <p class="text-muted">Create a passkey using your device's biometric authentication, PIN, or
+                            security key.</p>
+
+                        <div class="form-group mb-3">
+                            <label for="username">Username:</label>
+                            <input type="text" id="username" class="form-control" placeholder="Enter username" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" class="form-control" placeholder="Enter email" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="displayName">Display Name:</label>
+                            <input type="text" id="displayName" class="form-control"
+                                placeholder="Enter display name (optional)">
+                        </div>
+
+                        <button id="registerPasskey" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Register Passkey
+                        </button>
+                    </div>
+
+                    <hr>
+
+                    <!-- Authentication Section -->
+                    <div class="mb-4">
+                        <h4>Sign In with Passkey</h4>
+                        <p class="text-muted">Use your registered passkey to sign in without a password.</p>
+
+                        <div class="form-group mb-3">
+                            <label for="authUsername">Username (optional):</label>
+                            <input type="text" id="authUsername" class="form-control"
+                                placeholder="Leave empty for usernameless login">
+                            <small class="form-text text-muted">Leave empty to choose from all available passkeys on
+                                this device.</small>
+                        </div>
+
+                        <button id="authenticatePasskey" class="btn btn-success">
+                            <i class="fas fa-sign-in-alt"></i> Sign In with Passkey
+                        </button>
+                    </div>
+
+                    <!-- Status Messages -->
+                    <div id="statusMessage" class="alert" style="display: none;"></div>
+
+                    <!-- User Info (shown after successful authentication) -->
+                    <div id="userInfo" class="mt-4" style="display: none;">
+                        <h4>Authenticated User</h4>
+                        <div id="userDetails"></div>
+                        <button id="signOut" class="btn btn-outline-secondary mt-2">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // WebAuthn/Passkey JavaScript implementation
+    class PasskeyManager {
+        constructor() {
+            this.baseUrl = '/api/webauthn';
+            this.currentUser = null;
+        }
+
+        // Convert ArrayBuffer to Base64
+        arrayBufferToBase64(buffer) {
+            return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        }
+
+        // Convert Base64 to ArrayBuffer
+        base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        // Show status message
+        showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('statusMessage');
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Register a new passkey
+        async registerPasskey() {
+            try {
+                const username = document.getElementById('username').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const displayName = document.getElementById('displayName').value.trim() || username;
+
+                if (!username || !email) {
+                    this.showMessage('Username and email are required', 'danger');
+                    return;
+                }
+
+                this.showMessage('Starting passkey registration...', 'info');
+
+                // Step 1: Get registration options from server
+                const beginResponse = await fetch(`${this.baseUrl}/register/begin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, displayName })
+                });
+
+                if (!beginResponse.ok) {
+                    throw new Error('Failed to begin registration');
+                }
+
+                const { options, sessionId } = await beginResponse.json();
+
+                // Step 2: Convert server options for WebAuthn API
+                const publicKeyCredentialCreationOptions = {
+                    challenge: this.base64ToArrayBuffer(options.challenge),
+                    rp: options.rp,
+                    user: {
+                        id: this.base64ToArrayBuffer(options.user.id),
+                        name: options.user.name,
+                        displayName: options.user.displayName
+                    },
+                    pubKeyCredParams: options.pubKeyCredParams,
+                    authenticatorSelection: options.authenticatorSelection,
+                    timeout: options.timeout,
+                    attestation: options.attestation
+                };
+
+                // Step 3: Create credential using WebAuthn API
+                this.showMessage('Please complete the authentication on your device...', 'warning');
+
+                const credential = await navigator.credentials.create({
+                    publicKey: publicKeyCredentialCreationOptions
+                });
+
+                if (!credential) {
+                    throw new Error('Failed to create credential');
+                }
+
+                // Step 4: Prepare response for server
+                const attestationResponse = {
+                    id: credential.id,
+                    rawId: this.arrayBufferToBase64(credential.rawId),
+                    response: {
+                        attestationObject: this.arrayBufferToBase64(credential.response.attestationObject),
+                        clientDataJSON: this.arrayBufferToBase64(credential.response.clientDataJSON)
+                    },
+                    type: credential.type
+                };
+
+                // Step 5: Complete registration on server
+                const completeResponse = await fetch(`${this.baseUrl}/register/complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        attestationResponse: JSON.stringify(attestationResponse),
+                        sessionId
+                    })
+                });
+
+                if (!completeResponse.ok) {
+                    throw new Error('Failed to complete registration');
+                }
+
+                const result = await completeResponse.json();
+
+                if (result.success) {
+                    this.showMessage('Passkey registered successfully!', 'success');
+                    // Clear form
+                    document.getElementById('username').value = '';
+                    document.getElementById('email').value = '';
+                    document.getElementById('displayName').value = '';
+                } else {
+                    throw new Error('Registration failed');
+                }
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                this.showMessage(`Registration failed: ${error.message}`, 'danger');
+            }
+        }
+
+        // Authenticate with passkey
+        async authenticatePasskey() {
+            try {
+                const username = document.getElementById('authUsername').value.trim() || null;
+
+                this.showMessage('Starting passkey authentication...', 'info');
+
+                // Step 1: Get authentication options from server
+                const beginResponse = await fetch(`${this.baseUrl}/authenticate/begin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+
+                if (!beginResponse.ok) {
+                    throw new Error('Failed to begin authentication');
+                }
+
+                const { options, sessionId } = await beginResponse.json();
+
+                // Step 2: Convert server options for WebAuthn API
+                const publicKeyCredentialRequestOptions = {
+                    challenge: this.base64ToArrayBuffer(options.challenge),
+                    timeout: options.timeout,
+                    rpId: options.rpId,
+                    allowCredentials: options.allowCredentials?.map(cred => ({
+                        id: this.base64ToArrayBuffer(cred.id),
+                        type: cred.type,
+                        transports: cred.transports
+                    })),
+                    userVerification: options.userVerification
+                };
+
+                // Step 3: Get assertion using WebAuthn API
+                this.showMessage('Please authenticate with your passkey...', 'warning');
+
+                const assertion = await navigator.credentials.get({
+                    publicKey: publicKeyCredentialRequestOptions
+                });
+
+                if (!assertion) {
+                    throw new Error('Failed to get assertion');
+                }
+
+                // Step 4: Prepare response for server
+                const assertionResponse = {
+                    id: assertion.id,
+                    rawId: this.arrayBufferToBase64(assertion.rawId),
+                    response: {
+                        authenticatorData: this.arrayBufferToBase64(assertion.response.authenticatorData),
+                        clientDataJSON: this.arrayBufferToBase64(assertion.response.clientDataJSON),
+                        signature: this.arrayBufferToBase64(assertion.response.signature),
+                        userHandle: assertion.response.userHandle ? this.arrayBufferToBase64(assertion.response.userHandle) : null
+                    },
+                    type: assertion.type
+                };
+
+                // Step 5: Complete authentication on server
+                const completeResponse = await fetch(`${this.baseUrl}/authenticate/complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        assertionResponse: JSON.stringify(assertionResponse),
+                        sessionId
+                    })
+                });
+
+                if (!completeResponse.ok) {
+                    throw new Error('Failed to complete authentication');
+                }
+
+                const result = await completeResponse.json();
+
+                if (result.success) {
+                    this.currentUser = result.user;
+                    this.showMessage('Authentication successful!', 'success');
+                    this.displayUserInfo(result.user);
+                } else {
+                    throw new Error('Authentication failed');
+                }
+
+            } catch (error) {
+                console.error('Authentication error:', error);
+                this.showMessage(`Authentication failed: ${error.message}`, 'danger');
+            }
+        }
+
+        // Display user information after successful authentication
+        displayUserInfo(user) {
+            const userInfoDiv = document.getElementById('userInfo');
+            const userDetailsDiv = document.getElementById('userDetails');
+
+            userDetailsDiv.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">${user.displayName}</h5>
+                    <p class="card-text">
+                        <strong>Username:</strong> ${user.username}<br>
+                        <strong>Email:</strong> ${user.email}<br>
+                        <strong>User ID:</strong> ${user.id}
+                    </p>
+                </div>
+            </div>
+        `;
+
+            userInfoDiv.style.display = 'block';
+        }
+
+        // Sign out
+        signOut() {
+            this.currentUser = null;
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('authUsername').value = '';
+            this.showMessage('Signed out successfully', 'info');
+        }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        const passkeyManager = new PasskeyManager();
+
+        // Check if WebAuthn is supported
+        if (!window.PublicKeyCredential) {
+            passkeyManager.showMessage('WebAuthn is not supported in this browser', 'danger');
+            return;
+        }
+
+        // Event listeners
+        document.getElementById('registerPasskey').addEventListener('click', () => {
+            passkeyManager.registerPasskey();
+        });
+
+        document.getElementById('authenticatePasskey').addEventListener('click', () => {
+            passkeyManager.authenticatePasskey();
+        });
+
+        document.getElementById('signOut').addEventListener('click', () => {
+            passkeyManager.signOut();
+        });
+    });
+</script>
+
+   securitykey.</p>
+
+                               
+                               
+       thisdevice.small</div>
+                                                                                                    
+                                                                                                                                                                
+                                                                                                                    
+                                                                                                                                                                        
+                                                                                                                        
+                                                            
+
+                                                                                                                 
